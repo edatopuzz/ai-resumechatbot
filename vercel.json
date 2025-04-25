@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_CONVEX_URL": "@next_public_convex_url",
+    "RESEND_API_KEY": "@resend_api_key",
+    "SITE_URL": "@site_url"
+  }
+} 

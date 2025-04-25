@@ -1,114 +1,187 @@
 import os
-from tqdm import tqdm
-from llama_index.core import (
-    SimpleDirectoryReader,
-    OpenAIEmbedding,
-    Document,
-    VectorStoreIndex
-)
-from llama_hub.file.llama_parse import LlamaParse
-from convex import ConvexClient
-from dotenv import load_dotenv
-import nest_asyncio
-from collections import defaultdict
+from pathlib import Path
+from openai import OpenAI
+from llama_index.core import SimpleDirectoryReader, Document
 from llama_index.core.node_parser import SemanticSplitterNodeParser
+from dotenv import load_dotenv
+from convex import ConvexClient
+import docx
+import json
+from typing import List, Dict, Any
+import time
+from datetime import datetime
+from tqdm import tqdm
 
-def process_documents():
-    # Load environment variables
-    load_dotenv()
-    
-    # Set up Convex connection
-    client = ConvexClient('https://resolute-donkey-193.convex.cloud')  # Your Convex URL
-    
-    # Initialize async support
-    nest_asyncio.apply()
+# Get the absolute path to the script's directory
+SCRIPT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPT_DIR.parent
 
-    # Set up document parser with LlamaParse
-    parser = LlamaParse(
-        api_key=os.getenv('LLAMA_CLOUD_API_KEY'),
-        result_type="markdown",
-        verbose=True
-    )
-    
-    print("Loading documents from data directory...")
-    # Load documents from data directory
-    document_loader = SimpleDirectoryReader(
-        "./data",
-        file_extractor={
-            ".pdf": parser,
-            ".docx": parser,
-            ".doc": parser
-        }
-    )
-    documents = document_loader.load_data()
+# Load environment variables
+env_path = PROJECT_ROOT / ".env"
+if not env_path.exists():
+    raise FileNotFoundError(f"Environment file not found at {env_path}")
+load_dotenv(env_path)
 
-    print("Processing and merging documents...")
-    # Process documents by filename
-    doc_groups = defaultdict(list)
-    for doc in documents:
-        filename = doc.metadata.get("file_name")
-        doc_groups[filename].append(doc)
+# Check for required environment variables
+required_env_vars = ["OPENAI_API_KEY", "NEXT_PUBLIC_CONVEX_URL"]
+missing_vars = [var for var in required_env_vars if not os.getenv(var)]
+if missing_vars:
+    raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
-    # Merge document contents
-    processed_docs = []
-    for filename, docs in doc_groups.items():
-        # Combine document contents
-        full_text = "\n\n".join([doc.text for doc in docs])
-        # Keep metadata from first document
-        doc_metadata = docs[0].metadata
-        # Create merged document
-        processed_doc = Document(text=full_text, metadata=doc_metadata)
-        processed_docs.append(processed_doc)
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    print("Setting up embedding model and text processing...")
-    # Initialize embedding model
-    embedder = OpenAIEmbedding(model="text-embedding-3-small")
-    
-    # Set up advanced text splitting
-    text_processor = SemanticSplitterNodeParser(
-        buffer_size=1,
-        breakpoint_percentile_threshold=95,
-        embed_model=embedder
-    )
+# Initialize Convex client
+convex = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
 
-    print("Storing documents and generating embeddings...")
-    # Process each document
-    for doc in tqdm(processed_docs, desc="Processing documents"):
-        # Prepare document info
-        doc_info = {
-            'title': doc.metadata.get("file_name"),
-            'text': str(doc.text),
-            'lastModifiedDate': doc.metadata.get("last_modified_date")
-        }
-
-        # Save document to Convex
-        doc_id = client.mutation("documents:store", doc_info)
-        print(f"Stored document: {doc_info['title']}")
-
-        # Process document into chunks
-        chunks = text_processor.get_nodes_from_documents([doc])
+def read_docx(file_path: str) -> Dict[str, Any]:
+    """Read a .docx file and return its content with metadata."""
+    try:
+        doc = docx.Document(file_path)
+        content = "\n".join([paragraph.text for paragraph in doc.paragraphs])
         
-        print(f"Processing chunks for {doc_info['title']}...")
+        # Extract metadata
+        metadata = {
+            "file_name": Path(file_path).name,
+            "file_size": os.path.getsize(file_path),
+            "last_modified": datetime.fromtimestamp(os.path.getmtime(file_path)).isoformat(),
+            "total_paragraphs": len(doc.paragraphs),
+            "total_characters": len(content)
+        }
+        
+        return {
+            "content": content,
+            "metadata": metadata
+        }
+    except Exception as e:
+        print(f"Error reading {file_path}: {str(e)}")
+        raise
+
+def get_embedding(text: str) -> List[float]:
+    """Get embedding for a text chunk using OpenAI API."""
+    try:
+        response = client.embeddings.create(
+            input=text,
+            model="text-embedding-ada-002"
+        )
+        return response.data[0].embedding
+    except Exception as e:
+        print(f"Error getting embedding: {str(e)}")
+        raise
+
+def process_resume():
+    """Process the resume and store it in the database."""
+    try:
+        # Get the absolute path to the resume
+        resume_path = PROJECT_ROOT / "data" / "EdaTopuz_Resume 2025.docx"
+        print(f"Reading resume from: {resume_path}")
+        
+        if not resume_path.exists():
+            raise FileNotFoundError(f"Resume file not found at {resume_path}")
+        
+        # Read the resume
+        doc = docx.Document(str(resume_path))
+        content = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+        
+        if not content.strip():
+            raise ValueError("Resume appears to be empty")
+        
+        print(f"Successfully read resume. Length: {len(content)} characters")
+        
+        # Get embedding for the full document
+        print("Generating embedding for the document...")
+        embedding = get_embedding(content)
+        print("Successfully generated embedding")
+        
+        # Store the document with embedding
+        print("Storing document in Convex...")
+        document_id = convex.mutation("documents:store", {
+            "name": resume_path.name,
+            "content": content,
+            "embedding": embedding
+        })
+        print(f"Stored document with ID: {document_id}")
+        
+        # Split into chunks
+        chunks = split_into_semantic_chunks(content)
+        print(f"Split resume into {len(chunks)} chunks")
+        
         # Process each chunk
-        for chunk in chunks:
-            chunk_text = chunk.get_content()
-            chunk_embedding = embedder.get_text_embedding(chunk_text)
+        for i, chunk in enumerate(chunks):
+            print(f"Processing chunk {i+1}/{len(chunks)}")
             
-            # Store chunk data
-            chunk_info = {
-                'documentId': doc_id,
-                'text': chunk_text,
-                'embedding': chunk_embedding
-            }
+            # Get embedding for the chunk
+            embedding = get_embedding(chunk["content"])
             
-            chunk_id = client.mutation("chunks:store", chunk_info)
-            print(f"Stored chunk with ID: {chunk_id}")
+            # Store the chunk
+            print("Storing chunk in Convex...")
+            result = convex.mutation("documents:store", {
+                "name": f"resume_chunk_{i}",
+                "content": chunk["content"],
+                "embedding": embedding
+            })
+            
+            print(f"Stored chunk {i+1} with ID: {result}")
+            time.sleep(1)  # Add delay to avoid rate limits
+        
+        print("Successfully processed and stored all resume chunks!")
+        
+    except FileNotFoundError as e:
+        print(f"File error: {str(e)}")
+        raise
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        raise
+
+def split_into_semantic_chunks(text: str, chunk_size: int = 1000) -> List[Dict[str, Any]]:
+    """Split text into chunks of approximately equal size."""
+    try:
+        # Split text into paragraphs
+        paragraphs = text.split('\n')
+        chunks = []
+        current_chunk = []
+        current_size = 0
+        chunk_index = 0
+        
+        for paragraph in paragraphs:
+            # Skip empty paragraphs
+            if not paragraph.strip():
+                continue
+                
+            # If adding this paragraph would exceed chunk size, save current chunk
+            if current_size + len(paragraph) > chunk_size and current_chunk:
+                chunk_text = '\n'.join(current_chunk)
+                chunks.append({
+                    "content": chunk_text,
+                    "metadata": {
+                        "chunk_index": chunk_index,
+                        "chunk_size": len(chunk_text)
+                    }
+                })
+                current_chunk = []
+                current_size = 0
+                chunk_index += 1
+            
+            # Add paragraph to current chunk
+            current_chunk.append(paragraph)
+            current_size += len(paragraph)
+        
+        # Don't forget the last chunk
+        if current_chunk:
+            chunk_text = '\n'.join(current_chunk)
+            chunks.append({
+                "content": chunk_text,
+                "metadata": {
+                    "chunk_index": chunk_index,
+                    "chunk_size": len(chunk_text)
+                }
+            })
+        
+        return chunks
+    except Exception as e:
+        print(f"Error splitting text: {str(e)}")
+        raise
 
 if __name__ == "__main__":
-    print("Starting document processing...")
-    try:
-        process_documents()
-        print("Document processing completed successfully!")
-    except Exception as e:
-        print(f"Error during processing: {str(e)}")  
-
+    process_resume()
+    
