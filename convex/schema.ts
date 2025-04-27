@@ -18,6 +18,7 @@ export default defineSchema({
     content: v.string(),
     role: v.string(),
     timestamp: v.number(),
+    userId: v.optional(v.string()),
   }).index("by_timestamp", ["timestamp"]),
   accessRequests: defineTable({
     email: v.string(),
@@ -26,4 +27,11 @@ export default defineSchema({
     requestedAt: v.number(),
     verifiedAt: v.optional(v.number()),
   }),
+  sessions: defineTable({
+    sessionId: v.string(),
+    userId: v.string(),
+    startTime: v.number(),
+    expirationTime: v.number(),
+    active: v.boolean(),
+  }).index("by_sessionId", ["sessionId"]),
 });

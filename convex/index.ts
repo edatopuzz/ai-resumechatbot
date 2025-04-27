@@ -1,5 +1,5 @@
 // Chat functions
-export { sendMessage, generateAnswer, listMessages, listDocuments } from "./chat";
+export { sendMessage, generateAnswer, getMessages, listDocuments } from "./chat";
 
 // Session functions
 export { createSession, getActiveSession, endSession } from "./session";

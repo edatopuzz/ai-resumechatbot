@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useMutation, useAction } from 'convex/react';
 import { api } from '../convex/_generated/api';
 import { Id } from '../convex/_generated/dataModel';
+import SuggestedQuestions from './SuggestedQuestions';
+import { suggestedQuestions } from '../data/suggestedQuestions';
 
 interface SearchResult {
   text: string;
@@ -34,6 +36,54 @@ export default function ChatInterface() {
     scrollToBottom();
   }, [messages]);
 
+  const getContextualQuestions = () => {
+    return suggestedQuestions;
+  };
+
+  const handleQuestionClick = async (question: string) => {
+    // Find the predefined answer for this question
+    const predefinedAnswer = suggestedQuestions.find(q => q.question === question)?.answer;
+    
+    if (predefinedAnswer) {
+      const timestamp = Date.now();
+      setIsLoading(true);
+      
+      // Add the question to messages immediately
+      setMessages(prev => [...prev, { content: question, role: 'user', timestamp }]);
+      
+      // Simulate loading time for better UX
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Split the answer into sentences and group them into paragraphs
+      const sentences = predefinedAnswer.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      const paragraphs = [];
+      let currentParagraph = '';
+      
+      for (let i = 0; i < sentences.length; i++) {
+        currentParagraph += sentences[i].trim() + '. ';
+        // Create a new paragraph every 2-3 sentences or when we reach the end
+        if ((i + 1) % 3 === 0 || i === sentences.length - 1) {
+          paragraphs.push(currentParagraph.trim());
+          currentParagraph = '';
+        }
+      }
+
+      // Add each paragraph as a separate message with a delay
+      for (let i = 0; i < paragraphs.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 800)); // Delay between messages
+        const aiMessage: Message = { 
+          role: 'assistant', 
+          content: paragraphs[i], 
+          timestamp: timestamp + i + 1 
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      }
+      
+      setInput('');
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -49,7 +99,7 @@ export default function ChatInterface() {
       setMessages(prev => [...prev, newMessage]);
       await sendMessage(newMessage);
 
-      // Generate AI response
+      // Generate AI response for follow-up questions
       const response = await generateAnswer({
         content: userMessage,
         timestamp,
@@ -82,29 +132,37 @@ export default function ChatInterface() {
             <h2 className="text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
               Welcome to Eda's Resume GPT
             </h2>
-            <p className="text-gray-600 max-w-md">
+            <p className="text-gray-600 max-w-md mb-8">
               Ask me anything about my experience, skills, or achievements. I'm here to help!
             </p>
+            <SuggestedQuestions onQuestionClick={handleQuestionClick} />
           </div>
         ) : (
-          messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
+          <>
+            {messages.map((message, index) => (
               <div
-                className={`max-w-[80%] rounded-2xl p-4 ${
-                  message.role === 'user'
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
-                    : 'bg-white shadow-lg border border-gray-100'
+                key={index}
+                className={`flex ${
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                <div
+                  className={`max-w-[80%] rounded-2xl p-4 ${
+                    message.role === 'user'
+                      ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white'
+                      : 'bg-white shadow-lg border border-gray-100'
+                  }`}
+                >
+                  <p className="text-sm whitespace-pre-line">{message.content}</p>
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+            {!isLoading && getContextualQuestions().length > 0 && (
+              <div className="mt-8">
+                <SuggestedQuestions onQuestionClick={handleQuestionClick} questions={getContextualQuestions()} />
+              </div>
+            )}
+          </>
         )}
         {isLoading && (
           <div className="flex justify-start">

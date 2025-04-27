@@ -80,12 +80,20 @@ export default function SignIn() {
               <h1 className="text-3xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2 tracking-tight">
                 Eda's Resume GPT
               </h1>
-              <p className="text-gray-600 text-base mb-4 font-light">Advanced AI-Powered Professional Profile</p>
+              <div className="flex justify-center mb-4">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-indigo-100 hover:scale-105 transition-transform duration-200">
+                  <img 
+                    src="/eda-profile.jpg" 
+                    alt="Eda Topuz" 
+                    className="w-full h-full object-cover scale-110"
+                  />
+                </div>
+              </div>
               <div className="bg-white/90 p-4 rounded-lg border border-gray-100">
                 <p className="text-gray-600 text-sm leading-relaxed font-light">
-                  Welcome! I'm an advanced AI assistant powered by state-of-the-art language models and custom RAG architecture. 
-                  I can provide detailed insights into Eda's technical expertise, project implementations, and professional achievements. 
-                  Built with cutting-edge AI technologies and modern web architecture.
+                  Hey there! I'm Eda's AI assistant — built by Eda to give you a fast, smart way to explore her professional journey.
+                  Ask me about her skills, projects, and career milestones — I'm powered by advanced AI and modern web technologies.
+                  Feel free to dive in and get to know Eda better!
                 </p>
               </div>
             </div>
@@ -138,80 +146,96 @@ export default function SignIn() {
           <div className="space-y-3 max-w-md">
             <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-gray-100">
               <h4 className="font-semibold text-gray-900 mb-2 text-base">
-                Advanced AI Processing
+                AI Architecture
               </h4>
               <ul className="text-sm text-gray-600 space-y-1 font-light">
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Custom RAG implementation with LlamaIndex for semantic understanding
+                  GPT-3.5-turbo and Cohere dual-model system
                 </li>
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Multi-model architecture using GPT-4 and Cohere
+                  Custom document processing pipeline with semantic chunking
                 </li>
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Advanced prompt engineering with dynamic context injection
+                  Advanced prompt engineering with context injection
+                </li>
+                <li className="flex items-center">
+                  <span className="mr-2 text-gray-400">•</span>
+                  Multi-model response refinement pipeline
                 </li>
               </ul>
             </div>
 
             <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-gray-100">
               <h4 className="font-semibold text-gray-900 mb-2 text-base">
-                Scalable Architecture
+                Backend Architecture
               </h4>
               <ul className="text-sm text-gray-600 space-y-1 font-light">
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Real-time data synchronization with Convex
+                  Convex real-time database with instant sync
                 </li>
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Type-safe operations with automatic schema validation
+                  Type-safe operations with schema validation
                 </li>
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Optimized serverless functions with cold start handling
+                  Serverless functions with cold start optimization
+                </li>
+                <li className="flex items-center">
+                  <span className="mr-2 text-gray-400">•</span>
+                  Parallel document processing pipeline
                 </li>
               </ul>
             </div>
 
             <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-gray-100">
               <h4 className="font-semibold text-gray-900 mb-2 text-base">
-                Intelligent Search
+                Search Engine
               </h4>
               <ul className="text-sm text-gray-600 space-y-1 font-light">
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Hybrid search combining vector similarity and keyword matching
+                  Vector and keyword hybrid search system
                 </li>
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Context-aware response generation with chain-of-thought reasoning
+                  Context-aware response generation
                 </li>
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Dynamic context window management for optimal performance
+                  Dynamic context window management
+                </li>
+                <li className="flex items-center">
+                  <span className="mr-2 text-gray-400">•</span>
+                  Semantic document analysis and processing
                 </li>
               </ul>
             </div>
 
             <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-gray-100">
               <h4 className="font-semibold text-gray-900 mb-2 text-base">
-                Modern Frontend
+                Frontend Stack
               </h4>
               <ul className="text-sm text-gray-600 space-y-1 font-light">
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Next.js 14 with App Router and React Server Components
+                  Next.js 14 with React Server Components
                 </li>
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Real-time updates with WebSocket integration
+                  Convex real-time state management
                 </li>
                 <li className="flex items-center">
                   <span className="mr-2 text-gray-400">•</span>
-                  Optimistic UI updates for seamless user experience
+                  Optimistic UI with error handling
+                </li>
+                <li className="flex items-center">
+                  <span className="mr-2 text-gray-400">•</span>
+                  Responsive design with modern UI
                 </li>
               </ul>
             </div>

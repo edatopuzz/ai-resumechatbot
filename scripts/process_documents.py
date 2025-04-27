@@ -37,7 +37,7 @@ convex = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
 def read_docx(file_path: str) -> Dict[str, Any]:
     """Read a .docx file and return its content with metadata."""
     try:
-        doc = docx.Document(file_path)
+    doc = docx.Document(file_path)
         content = "\n".join([paragraph.text for paragraph in doc.paragraphs])
         
         # Extract metadata
@@ -69,62 +69,119 @@ def get_embedding(text: str) -> List[float]:
         print(f"Error getting embedding: {str(e)}")
         raise
 
-def process_resume():
-    """Process the resume and store it in the database."""
+def process_documents():
+    """Process all documents and store them in the database."""
     try:
-        # Get the absolute path to the resume
-        resume_path = PROJECT_ROOT / "data" / "EdaTopuz_Resume 2025.docx"
-        print(f"Reading resume from: {resume_path}")
+        # Get the absolute paths to the documents
+        documents_dir = PROJECT_ROOT / "data"
+        resume_path = documents_dir / "EdaTopuz_Resume 2025.docx"
+        suggested_answers_path = documents_dir / "suggested_answers.docx"
         
+        print(f"\nDebug: Starting document processing")
+        print(f"Debug: Looking for resume at {resume_path}")
+        print(f"Debug: Looking for suggested answers at {suggested_answers_path}")
+        
+        # Process resume
+        print(f"Processing resume from: {resume_path}")
         if not resume_path.exists():
             raise FileNotFoundError(f"Resume file not found at {resume_path}")
         
-        # Read the resume
-        doc = docx.Document(str(resume_path))
-        content = "\n".join([paragraph.text for paragraph in doc.paragraphs])
-        
-        if not content.strip():
+        resume_content = read_docx(str(resume_path))["content"]
+        if not resume_content.strip():
             raise ValueError("Resume appears to be empty")
         
-        print(f"Successfully read resume. Length: {len(content)} characters")
+        print(f"Successfully read resume. Length: {len(resume_content)} characters")
+        print(f"Debug: First 100 characters of resume: {resume_content[:100]}...")
         
-        # Get embedding for the full document
-        print("Generating embedding for the document...")
-        embedding = get_embedding(content)
-        print("Successfully generated embedding")
+        # Get embedding for the resume
+        print("Generating embedding for the resume...")
+        resume_embedding = get_embedding(resume_content)
+        print(f"Successfully generated resume embedding. Length: {len(resume_embedding)}")
+        print(f"Debug: First 5 values of embedding: {resume_embedding[:5]}")
         
-        # Store the document with embedding
-        print("Storing document in Convex...")
-        document_id = convex.mutation("documents:store", {
-            "name": resume_path.name,
-            "content": content,
-            "embedding": embedding
+        # Store the resume
+        print("Storing resume in Convex...")
+        print(f"Debug: Attempting to store with name: resume")
+        print(f"Debug: Content length: {len(resume_content)}")
+        print(f"Debug: Embedding length: {len(resume_embedding)}")
+        
+        resume_id = convex.mutation("documents:store", {
+            "name": "resume",
+            "content": resume_content,
+            "embedding": resume_embedding
         })
-        print(f"Stored document with ID: {document_id}")
+        print(f"Stored resume with ID: {resume_id}")
         
-        # Split into chunks
-        chunks = split_into_semantic_chunks(content)
-        print(f"Split resume into {len(chunks)} chunks")
+        # Split resume into chunks
+        resume_chunks = split_into_semantic_chunks(resume_content)
+        print(f"Split resume into {len(resume_chunks)} chunks")
         
-        # Process each chunk
-        for i, chunk in enumerate(chunks):
-            print(f"Processing chunk {i+1}/{len(chunks)}")
+        # Process resume chunks
+        for i, chunk in enumerate(resume_chunks):
+            print(f"Processing resume chunk {i+1}/{len(resume_chunks)}")
             
             # Get embedding for the chunk
             embedding = get_embedding(chunk["content"])
             
             # Store the chunk
-            print("Storing chunk in Convex...")
+            print("Storing resume chunk in Convex...")
             result = convex.mutation("documents:store", {
                 "name": f"resume_chunk_{i}",
                 "content": chunk["content"],
                 "embedding": embedding
             })
             
-            print(f"Stored chunk {i+1} with ID: {result}")
+            print(f"Stored resume chunk {i+1} with ID: {result}")
             time.sleep(1)  # Add delay to avoid rate limits
         
-        print("Successfully processed and stored all resume chunks!")
+        # Process suggested answers
+        print(f"Processing suggested answers from: {suggested_answers_path}")
+        if not suggested_answers_path.exists():
+            raise FileNotFoundError(f"Suggested answers file not found at {suggested_answers_path}")
+        
+        suggested_answers_content = read_docx(str(suggested_answers_path))["content"]
+        if not suggested_answers_content.strip():
+            raise ValueError("Suggested answers file appears to be empty")
+        
+        print(f"Successfully read suggested answers. Length: {len(suggested_answers_content)} characters")
+        
+        # Get embedding for suggested answers
+        print("Generating embedding for suggested answers...")
+        answers_embedding = get_embedding(suggested_answers_content)
+        print("Successfully generated suggested answers embedding")
+        
+        # Store the suggested answers
+        print("Storing suggested answers in Convex...")
+        answers_id = convex.mutation("documents:store", {
+            "name": "suggested_answers",
+            "content": suggested_answers_content,
+            "embedding": answers_embedding
+        })
+        print(f"Stored suggested answers with ID: {answers_id}")
+        
+        # Split suggested answers into chunks
+        answers_chunks = split_into_semantic_chunks(suggested_answers_content)
+        print(f"Split suggested answers into {len(answers_chunks)} chunks")
+        
+        # Process suggested answers chunks
+        for i, chunk in enumerate(answers_chunks):
+            print(f"Processing suggested answers chunk {i+1}/{len(answers_chunks)}")
+            
+            # Get embedding for the chunk
+            embedding = get_embedding(chunk["content"])
+            
+            # Store the chunk
+            print("Storing suggested answers chunk in Convex...")
+            result = convex.mutation("documents:store", {
+                "name": f"suggested_answers_chunk_{i}",
+                "content": chunk["content"],
+                "embedding": embedding
+            })
+            
+            print(f"Stored suggested answers chunk {i+1} with ID: {result}")
+            time.sleep(1)  # Add delay to avoid rate limits
+        
+        print("Successfully processed and stored all documents and chunks!")
         
     except FileNotFoundError as e:
         print(f"File error: {str(e)}")
@@ -178,10 +235,10 @@ def split_into_semantic_chunks(text: str, chunk_size: int = 1000) -> List[Dict[s
             })
         
         return chunks
-    except Exception as e:
+        except Exception as e:
         print(f"Error splitting text: {str(e)}")
         raise
 
 if __name__ == "__main__":
-    process_resume()
+    process_documents()
     
