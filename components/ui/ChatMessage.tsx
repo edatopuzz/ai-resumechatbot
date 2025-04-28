@@ -1,6 +1,5 @@
 import React from 'react';
-import { Avatar } from './avatar';
-import { Card } from './card';
+import { Avatar, Card } from '.';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
