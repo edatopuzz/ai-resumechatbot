@@ -1,6 +1,6 @@
 import React from 'react';
-import { Avatar } from '@/components/ui/avatar';
-import { Card } from '@/components/ui/card';
+import { Avatar } from './avatar';
+import { Card } from './card';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
