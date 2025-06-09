@@ -1,7 +1,11 @@
 {
-  "buildCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/.next",
-  "installCommand": "cd frontend && npm install",
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
   "env": {
     "NEXT_PUBLIC_CONVEX_URL": "https://resolute-donkey-193.convex.cloud",
     "CONVEX_DEPLOYMENT": "dev:resolute-donkey-193"
