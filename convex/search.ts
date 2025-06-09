@@ -42,7 +42,7 @@ export const chunkEmbeddingsRetriever = internalAction({
         const embedding = await generateQueryEmbedding(args.question);
         const results = await ctx.vectorSearch("documents", "by_embedding", {
             vector: embedding,
-            limit: 25
+            limit: 50
         });
         const chunks: Array<Doc<"documents">> = await ctx.runQuery(
             internal.search.fetchResults,
@@ -107,7 +107,7 @@ export const hybridSearch = action({
             // Perform vector search
             const results = await ctx.vectorSearch("documents", "by_embedding", {
                 vector: embedding,
-                limit: 25
+                limit: 50
             });
             console.log("Vector search results:", results.length);
 
