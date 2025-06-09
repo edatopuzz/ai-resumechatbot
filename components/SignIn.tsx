@@ -43,19 +43,31 @@ export default function SignIn() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-        <div className="max-w-md w-full p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-8 animate-pulse" style={{ animationDelay: '4s' }}></div>
+        </div>
+        
+        <div className="max-w-md w-full p-8 backdrop-blur-xl bg-white/70 border border-white/50 rounded-3xl shadow-2xl shadow-blue-500/10 relative z-10">
           <div className="text-center">
-            <h2 className="text-2xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent mb-4">
               Access Granted
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-8">
               Redirecting you to the chat interface...
             </p>
-            <div className="flex justify-center space-x-2">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="flex justify-center space-x-3">
+              <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-3 h-3 bg-gradient-to-r from-indigo-600 to-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         </div>
@@ -64,24 +76,24 @@ export default function SignIn() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-8 animate-pulse" style={{ animationDelay: '4s' }}></div>
+      </div>
+      
+      <div className="max-w-6xl mx-auto px-4 py-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Sign In Section */}
-          <div className="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-sm border border-gray-100">
+          <div className="backdrop-blur-xl bg-white/70 border border-white/50 p-8 rounded-3xl shadow-2xl shadow-blue-500/10">
             <div className="text-center mb-6">
-              <div className="flex items-center justify-center mb-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-              </div>
-              <h1 className="text-3xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2 tracking-tight">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 via-blue-700 to-indigo-700 bg-clip-text text-transparent mb-6 tracking-tight">
                 Eda's Resume GPT
               </h1>
-              <div className="flex justify-center mb-4">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-indigo-100 hover:scale-105 transition-transform duration-200">
+              <div className="flex justify-center mb-6">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-blue-200/50 hover:scale-105 transition-transform duration-200 shadow-lg">
                   <img 
                     src="/eda-profile.jpg" 
                     alt="Eda Topuz" 
@@ -89,7 +101,7 @@ export default function SignIn() {
                   />
                 </div>
               </div>
-              <div className="bg-white/90 p-4 rounded-lg border border-gray-100">
+              <div className="backdrop-blur-sm bg-white/40 rounded-2xl p-6 border border-white/30 shadow-inner mb-6">
                 <p className="text-gray-600 text-sm leading-relaxed font-light">
                   Hey there! I'm Eda's AI assistant — built by Eda to give you a fast, smart way to explore her professional journey.
                   Ask me about her skills, projects, and career milestones — I'm powered by advanced AI and modern web technologies.
@@ -98,9 +110,9 @@ export default function SignIn() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-light text-gray-600 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address
                 </label>
                 <input
@@ -108,14 +120,14 @@ export default function SignIn() {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white/80 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-6 py-4 border border-gray-300/50 rounded-2xl bg-white/80 backdrop-blur-sm text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 shadow-lg"
                   placeholder="Enter your email"
                   required
                 />
               </div>
 
               {error && (
-                <div className="text-sm text-red-500 bg-red-50/50 p-2 rounded-lg border border-red-100">
+                <div className="text-sm text-red-600 bg-red-50/80 backdrop-blur-sm p-4 rounded-2xl border border-red-200/50">
                   {error}
                 </div>
               )}
@@ -123,17 +135,17 @@ export default function SignIn() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-2 px-4 rounded-lg font-light transition-all duration-200 ${
+                className={`w-full py-4 px-8 rounded-2xl font-semibold transition-all duration-300 shadow-lg ${
                   isLoading
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600'
+                    ? 'bg-gray-300/50 text-gray-500 cursor-not-allowed border border-gray-400/30'
+                    : 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border border-blue-400/50 hover:border-blue-500/50 shadow-blue-500/25 hover:shadow-blue-500/40 transform hover:scale-105'
                 }`}
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <div className="flex items-center justify-center space-x-3">
+                    <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-3 h-3 bg-gradient-to-r from-indigo-600 to-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 ) : (
                   'Request Access'
@@ -143,98 +155,98 @@ export default function SignIn() {
           </div>
 
           {/* Technical Details Section */}
-          <div className="space-y-3 max-w-md">
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-gray-100">
-              <h4 className="font-semibold text-gray-900 mb-2 text-base">
+          <div className="space-y-4 max-w-md">
+            <div className="backdrop-blur-xl bg-white/70 border border-white/50 p-6 rounded-3xl shadow-2xl shadow-blue-500/10">
+              <h4 className="font-semibold text-gray-800 mb-4 text-lg">
                 AI Architecture
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1 font-light">
+              <ul className="text-sm text-gray-600 space-y-2 font-light">
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
-                  GPT-3.5-turbo and Cohere dual-model system
+                  <span className="mr-3 text-blue-400">•</span>
+                  GPT-4 and Cohere dual-model system
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Custom document processing pipeline with semantic chunking
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Advanced prompt engineering with context injection
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Multi-model response refinement pipeline
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-gray-100">
-              <h4 className="font-semibold text-gray-900 mb-2 text-base">
+            <div className="backdrop-blur-xl bg-white/70 border border-white/50 p-6 rounded-3xl shadow-2xl shadow-blue-500/10">
+              <h4 className="font-semibold text-gray-800 mb-4 text-lg">
                 Backend Architecture
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1 font-light">
+              <ul className="text-sm text-gray-600 space-y-2 font-light">
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Convex real-time database with instant sync
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Type-safe operations with schema validation
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Serverless functions with cold start optimization
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
-                  Parallel document processing pipeline
+                  <span className="mr-3 text-blue-400">•</span>
+                  Real-time chat message synchronization
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-gray-100">
-              <h4 className="font-semibold text-gray-900 mb-2 text-base">
+            <div className="backdrop-blur-xl bg-white/70 border border-white/50 p-6 rounded-3xl shadow-2xl shadow-blue-500/10">
+              <h4 className="font-semibold text-gray-800 mb-4 text-lg">
                 Search Engine
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1 font-light">
+              <ul className="text-sm text-gray-600 space-y-2 font-light">
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Vector and keyword hybrid search system
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Context-aware response generation
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Dynamic context window management
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
-                  Semantic document analysis and processing
+                  <span className="mr-3 text-blue-400">•</span>
+                  Intelligent follow-up question generation
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-sm border border-gray-100">
-              <h4 className="font-semibold text-gray-900 mb-2 text-base">
+            <div className="backdrop-blur-xl bg-white/70 border border-white/50 p-6 rounded-3xl shadow-2xl shadow-blue-500/10">
+              <h4 className="font-semibold text-gray-800 mb-4 text-lg">
                 Frontend Stack
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1 font-light">
+              <ul className="text-sm text-gray-600 space-y-2 font-light">
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Next.js 14 with React Server Components
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
-                  Convex real-time state management
+                  <span className="mr-3 text-blue-400">•</span>
+                  ElevenLabs Turbo v2.5 premium audio integration
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Optimistic UI with error handling
                 </li>
                 <li className="flex items-center">
-                  <span className="mr-2 text-gray-400">•</span>
+                  <span className="mr-3 text-blue-400">•</span>
                   Responsive design with modern UI
                 </li>
               </ul>
