@@ -37,7 +37,7 @@ convex = ConvexClient(os.getenv("NEXT_PUBLIC_CONVEX_URL"))
 def read_docx(file_path: str) -> Dict[str, Any]:
     """Read a .docx file and return its content with metadata."""
     try:
-    doc = docx.Document(file_path)
+        doc = docx.Document(file_path)
         content = "\n".join([paragraph.text for paragraph in doc.paragraphs])
         
         # Extract metadata
@@ -235,7 +235,7 @@ def split_into_semantic_chunks(text: str, chunk_size: int = 1000) -> List[Dict[s
             })
         
         return chunks
-        except Exception as e:
+    except Exception as e:
         print(f"Error splitting text: {str(e)}")
         raise
 
