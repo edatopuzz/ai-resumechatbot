@@ -276,13 +276,13 @@ export default function ChatInterface() {
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                className={`flex ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
+            className={`flex ${
+              message.role === 'user' ? 'justify-end' : 'justify-start'
                     } animate-fadeIn`}
-              >
-                <div
+          >
+            <div
                       className={`max-w-[80%] rounded-2xl p-6 backdrop-blur-xl border shadow-2xl ${
-                    message.role === 'user'
+                message.role === 'user'
                           ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white border-blue-400/30 shadow-blue-500/20'
                           : 'bg-white/80 border-gray-200/50 text-gray-800 shadow-gray-500/10'
                       }`}
@@ -407,7 +407,7 @@ export default function ChatInterface() {
             )}
           </button>
         </form>
-      </div>
+        </div>
     </div>
   );
 }
