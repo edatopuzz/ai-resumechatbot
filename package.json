@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.17.0",
+    "@elevenlabs/elevenlabs-js": "^2.2.0",
     "ai": "^4.3.9",
     "cohere-ai": "^7.17.1",
     "convex": "^1.23.0",
+    "elevenlabs": "^1.59.0",
     "next": "^14.2.25",
     "openai": "^4.96.0",
     "react": "^18.2.0",

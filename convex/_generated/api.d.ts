@@ -20,6 +20,7 @@ import type * as index from "../index.js";
 import type * as migrations from "../migrations.js";
 import type * as search from "../search.js";
 import type * as session from "../session.js";
+import type * as textToSpeech from "../textToSpeech.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   migrations: typeof migrations;
   search: typeof search;
   session: typeof session;
+  textToSpeech: typeof textToSpeech;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
