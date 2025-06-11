@@ -26,6 +26,26 @@ export const listDocuments = query({
   },
 });
 
+export const deleteDocument = mutation({
+  args: {
+    id: v.id("documents"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+    return { success: true };
+  },
+});
+
+export const clearAllDocuments = mutation({
+  handler: async (ctx) => {
+    const documents = await ctx.db.query("documents").collect();
+    for (const doc of documents) {
+      await ctx.db.delete(doc._id);
+    }
+    return { deleted: documents.length };
+  },
+});
+
 export const uploadDocument = mutation({
   args: {
     name: v.string(),
