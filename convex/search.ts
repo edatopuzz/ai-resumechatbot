@@ -97,37 +97,75 @@ export const hybridSearch = action({
         id: Id<"documents">;
         score: number;
     }>> {
-        console.log("Starting search with query:", args.query);
+        console.log("Starting hybrid search with query:", args.query);
         
         try {
-            // Generate embedding for the query
+            // First try semantic search
             const embedding = await generateQueryEmbedding(args.query);
-            console.log("Generated embedding");
+            console.log("Generated embedding for semantic search");
 
-            // Perform vector search
-            const results = await ctx.vectorSearch("documents", "by_embedding", {
+            const vectorResults = await ctx.vectorSearch("documents", "by_embedding", {
                 vector: embedding,
                 limit: 50
             });
-            console.log("Vector search results:", results.length);
+            console.log("Vector search results:", vectorResults.length);
 
-            // Fetch the full document content
-            const chunks = await ctx.runQuery(internal.search.fetchResults, {
-                ids: results.map((chunk) => chunk._id)
+            // If we have good semantic results, use them
+            if (vectorResults.length > 0 && vectorResults[0]._score > 0.7) {
+                const chunks = await ctx.runQuery(internal.search.fetchResults, {
+                    ids: vectorResults.map((chunk) => chunk._id)
+                });
+
+                return chunks.map((chunk, index) => ({
+                    text: chunk.content,
+                    id: chunk._id,
+                    score: vectorResults[index]._score
+                }));
+            }
+
+            // Fallback to lexical search if semantic search didn't yield good results
+            console.log("Falling back to lexical search");
+            const lexicalResults = await ctx.runQuery(internal.search.keywordRetriever, {
+                query: args.query
             });
 
-            // Map results to the expected format
-            const searchResults = chunks.map((chunk, index) => ({
-                text: chunk.content,
-                id: chunk._id,
-                score: results[index]._score
-            }));
+            // Combine results if we have both
+            if (vectorResults.length > 0) {
+                const semanticChunks = await ctx.runQuery(internal.search.fetchResults, {
+                    ids: vectorResults.map((chunk) => chunk._id)
+                });
 
-            console.log("Total results:", searchResults.length);
-            return searchResults;
+                const semanticResults = semanticChunks.map((chunk, index) => ({
+                    text: chunk.content,
+                    id: chunk._id,
+                    score: vectorResults[index]._score
+                }));
+
+                // Merge results, avoiding duplicates
+                const existingIds = new Set(semanticResults.map(doc => doc.id));
+                const uniqueLexicalResults = lexicalResults.filter(doc => !existingIds.has(doc.id));
+
+                // Combine and sort by score
+                const combinedResults = [...semanticResults, ...uniqueLexicalResults]
+                    .sort((a, b) => b.score - a.score);
+
+                return combinedResults;
+            }
+
+            // If no semantic results, return lexical results
+            return lexicalResults;
+
         } catch (error) {
-            console.error("Error in search:", error);
-            return [];
+            console.error("Error in hybrid search:", error);
+            // Final fallback: try lexical search if everything else fails
+            try {
+                return await ctx.runQuery(internal.search.keywordRetriever, {
+                    query: args.query
+                });
+            } catch (fallbackError) {
+                console.error("Fallback search also failed:", fallbackError);
+                return [];
+            }
         }
     }
 });

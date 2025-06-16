@@ -55,14 +55,15 @@ export default function ChatInterface() {
 
   const playResponseAudio = async (text: string, messageTimestamp: number) => {
     try {
-      setIsPlayingAudio(true);
-      setPlayingMessageId(messageTimestamp);
-      
-      // Stop any currently playing audio
+      // Stop any currently playing audio first
       if (currentAudio) {
         currentAudio.pause();
         currentAudio.currentTime = 0;
+        setCurrentAudio(null);
       }
+
+      setIsPlayingAudio(true);
+      setPlayingMessageId(messageTimestamp);
       
       const audio = await textToSpeechService.speak(text);
       if (audio) {
@@ -74,6 +75,27 @@ export default function ChatInterface() {
           setPlayingMessageId(null);
           setCurrentAudio(null);
         };
+
+        // Listen for errors
+        audio.onerror = (error) => {
+          console.error('Audio playback error:', error);
+          setIsPlayingAudio(false);
+          setPlayingMessageId(null);
+          setCurrentAudio(null);
+        };
+
+        // Ensure audio is loaded before playing
+        if (audio.readyState >= 2) { // HAVE_CURRENT_DATA
+          await audio.play();
+        } else {
+          // Wait for audio to be loaded
+          await new Promise((resolve) => {
+            audio.oncanplay = async () => {
+              await audio.play();
+              resolve(true);
+            };
+          });
+        }
       }
     } catch (error) {
       console.error('Error playing audio:', error);
@@ -216,10 +238,15 @@ export default function ChatInterface() {
         setMessages(prev => [...prev, aiMessage]);
         await sendMessage(aiMessage);
 
-        // Auto-play the AI response for voice inputs
-        setTimeout(() => {
-          playResponseAudio(response, aiMessage.timestamp);
-        }, 500); // Small delay to ensure message is rendered
+        // Auto-play the AI response for voice inputs with increased delay
+        setTimeout(async () => {
+          try {
+            await playResponseAudio(response, aiMessage.timestamp);
+          } catch (error) {
+            console.error('Error playing audio response:', error);
+            // Don't show error to user, just log it
+          }
+        }, 1000); // Increased delay to ensure message is fully rendered
 
         // Generate new follow-up questions based on the answer
         const newFollowUpQuestions = await generateFollowUpQuestions({
